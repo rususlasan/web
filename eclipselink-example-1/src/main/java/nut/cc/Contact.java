@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 /**
  * Created by Ruslan Shmelev on 19.01.2017.
+ * имена полей изменены, а так же имя таблицы, что необязательно
  */
 @Entity
 @Table(name = "contact_test")
