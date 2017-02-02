@@ -1,9 +1,6 @@
 package nut.cc;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 import java.util.List;
 
 public class ConsoleController {
@@ -38,7 +35,9 @@ public class ConsoleController {
     }
 
     public List<Contact> findAllContacts() {
-        return null;
+        TypedQuery<Contact> findAll = em.createQuery("SELECT c FROM Contact c", Contact.class);
+        List<Contact> contacts = findAll.getResultList();
+        return contacts;
     }
 
     /**

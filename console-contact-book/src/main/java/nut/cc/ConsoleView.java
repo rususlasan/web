@@ -3,6 +3,7 @@ package nut.cc;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  * Created by ruslansh on 02.02.17.
@@ -33,7 +34,7 @@ public class ConsoleView {
     public void begin() {
         String curr = "";
         while (true) {
-            consoleWriter("Change command: \nc - create contact,\na - print all contact,\nd - delete contact,\nq - quit program");
+            consoleWriter("Change command: \nc - create contact,\np - print all contact,\nd - delete contact,\nq - quit program");
             curr = consoleReader(null);
             if (curr.equals("q")) {
                 exit();
@@ -88,7 +89,12 @@ public class ConsoleView {
     }
 
     public void printAllContact() {
-
+        List<Contact> contacts = controller.findAllContacts();
+        consoleWriter("##### ALL CONTACTS #####");
+        for (Contact contact: contacts) {
+            consoleWriter(contact.toString());
+        }
+        consoleWriter("####################################################");
     }
 
     public Contact deleteContact() {
