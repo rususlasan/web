@@ -22,18 +22,21 @@ public class ConsoleView {
     }
 
     public void init() {
-        System.out.println("Change command: \nc - create contact,\na - print all contact,\nd - delete contact,\n q - quit program\n");
         reader = new BufferedReader(new InputStreamReader(System.in));
         begin();
     }
 
+    /**
+     * Запускает цикл в котором слушает пользовательский ввод и, в зависимости от ввода,
+     * запускает нужный метод или переходит на следующий шаг
+     */
     public void begin() {
         String curr = "";
         while (true) {
+            consoleWriter("Change command: \nc - create contact,\na - print all contact,\nd - delete contact,\nq - quit program");
             curr = consoleReader(null);
             if (curr.equals("q")) {
-                controller.closeRecources();
-                consoleWriter("Ending program!");
+                exit();
                 return;
             }
             else if (curr.equals("c")) addContact();
@@ -69,9 +72,18 @@ public class ConsoleView {
         }
     }
 
+    /**
+     * Считывает данные контакта и вызывает метод котроллера для создания контакта
+     * и записи его в БД
+     */
     public void addContact() {
-        Contact contact = controller.addContact();
-        if (contact != null) consoleWriter("Contact: " + contact + "\nwas successfully added!");
+        //считываем данные с консоли, для создания контакта
+        String name = consoleReader("Enter name: ");
+        String number = consoleReader("Enter number: ");
+        String description = consoleReader("Enter description: ");
+
+        Contact contact = controller.addContact(name, number, description);
+        if (contact != null) consoleWriter("#### Contact: " + contact + " ####\n#### was successfully added! ####");
         else consoleWriter("Contact didn't added.");
     }
 
@@ -81,5 +93,13 @@ public class ConsoleView {
 
     public Contact deleteContact() {
         return null;
+    }
+
+    /**
+     * Закрываем ресурсы контроллера и пишем что программа завершена
+     */
+    private void exit() {
+        controller.closeResources();
+        consoleWriter("Ending program!");
     }
 }

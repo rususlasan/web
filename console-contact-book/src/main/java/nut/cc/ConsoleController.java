@@ -25,14 +25,7 @@ public class ConsoleController {
         em = emf.createEntityManager();
     }
 
-    public Contact addContact() {
-        String name;
-        String number;
-        String description;
-
-        name = view.consoleReader("Enter name: ");
-        number = view.consoleReader("Enter number: ");
-        description = view.consoleReader("Enter description: ");
+    public Contact addContact(String name, String number, String description) {
 
         if (name.equals("") || number.equals("")) {
             return null;
@@ -48,6 +41,9 @@ public class ConsoleController {
         return null;
     }
 
+    /**
+     * Записывает переданный контакт в БД
+     */
     public void persistDataInDatabase(Contact contact) {
         EntityTransaction tx = em.getTransaction();
 
@@ -57,7 +53,7 @@ public class ConsoleController {
         tx.commit();
     }
 
-    public void closeRecources() {
+    public void closeResources() {
         em.close();
         emf.close();
     }

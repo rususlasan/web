@@ -11,8 +11,8 @@ import javax.persistence.Persistence;
 public class Main {
 
     public static void main(String[] args) {
-        Contact c1 = new Contact("Ruslan", "111111111");
-        Contact c2 = new Contact("Dasha", "1212121212222");
+        Contact c1 = new Contact("WWWW", "88888888");
+        Contact c2 = new Contact("RRRR", "8989898989");
 
         //получаем EntityManager и транзакцию для еденицы сохроняемости, описанной в файле persistence.xml
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("eclipselink-test1");
