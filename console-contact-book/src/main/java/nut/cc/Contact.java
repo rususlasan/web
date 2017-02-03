@@ -1,7 +1,5 @@
 package nut.cc;
 
-import com.sun.istack.internal.NotNull;
-
 import javax.persistence.*;
 
 /**
@@ -14,9 +12,9 @@ public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotNull
+  //  @NotNull
     private String name;
-    @NotNull
+    //@NotNull
     private String number;
     private String description;
 
@@ -50,7 +48,9 @@ public class Contact {
 
     @Override
     public String toString() {
-        return new StringBuilder().append(name)
+        return new StringBuilder().append(id)
+                .append("\t\t")
+                .append(name)
                 .append("\t\t")
                 .append(number)
                 .append("\t\t")

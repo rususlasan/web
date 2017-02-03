@@ -34,7 +34,7 @@ public class ConsoleView {
     public void begin() {
         String curr = "";
         while (true) {
-            consoleWriter("Change command: \nc - create contact,\np - print all contact,\nd - delete contact,\nq - quit program");
+            consoleWriter("Change command: \nc - create contact,\np - print all contact,\nd - delete contact,\nq - quit program\n");
             curr = consoleReader(null);
             if (curr.equals("q")) {
                 exit();
@@ -43,7 +43,7 @@ public class ConsoleView {
             else if (curr.equals("c")) addContact();
             else if (curr.equals("d")) deleteContact();
             else if (curr.equals("p")) printAllContact();
-            else consoleWriter("Command " + curr + " not found, try again.");
+            else consoleWriter("Command " + curr + " not found, try again.\n");
         }
     }
 
@@ -57,7 +57,7 @@ public class ConsoleView {
         try {
             res = reader.readLine();
         } catch (IOException e) {
-            consoleWriter("IOException in consoleReader(): " + e.getMessage());
+            consoleWriter("IOException in consoleReader(): " + e.getMessage() + "\n");
         } finally {
             return res;
         }
@@ -69,7 +69,7 @@ public class ConsoleView {
      */
     public void consoleWriter(String message) {
         if (message != null && !message.equals("")) {
-            System.out.println(message);
+            System.out.print(message);
         }
     }
 
@@ -84,17 +84,17 @@ public class ConsoleView {
         String description = consoleReader("Enter description: ");
 
         Contact contact = controller.addContact(name, number, description);
-        if (contact != null) consoleWriter("#### Contact: " + contact + " ####\n#### was successfully added! ####");
+        if (contact != null) consoleWriter("#### Contact: " + contact + " ####\n#### was successfully added! ####\n");
         else consoleWriter("Contact didn't added.");
     }
 
     public void printAllContact() {
         List<Contact> contacts = controller.findAllContacts();
-        consoleWriter("##### ALL CONTACTS #####");
+        consoleWriter("############### ALL CONTACTS ###############\n");
         for (Contact contact: contacts) {
-            consoleWriter(contact.toString());
+            consoleWriter(contact.toString() + "\n");
         }
-        consoleWriter("####################################################");
+        consoleWriter("############################################\n");
     }
 
     public Contact deleteContact() {
@@ -106,6 +106,6 @@ public class ConsoleView {
      */
     private void exit() {
         controller.closeResources();
-        consoleWriter("Ending program!");
+        consoleWriter("Ending program!\n");
     }
 }
