@@ -35,7 +35,7 @@ public class ConsoleView {
         String curr = "";
         while (true) {
             consoleWriter("Change command: \nc - create contact,\np - print all contact,\nd - delete contact,\nq - quit program\n");
-            curr = consoleReader(null);
+            curr = consoleReader();
             if (curr.equals("q")) {
                 exit();
                 return;
@@ -51,8 +51,7 @@ public class ConsoleView {
      * Считывает строку с консоли.
      * Перед считывание выводит сообщение в консоль, если оно передано
      */
-    public String consoleReader(String message) {
-        consoleWriter(message);
+    public String consoleReader() {
         String res = "";
         try {
             res = reader.readLine();
@@ -79,9 +78,14 @@ public class ConsoleView {
      */
     public void addContact() {
         //считываем данные с консоли, для создания контакта
-        String name = consoleReader("Enter name: ");
-        String number = consoleReader("Enter number: ");
-        String description = consoleReader("Enter description: ");
+        consoleWriter("Enter name: ");
+        String name = consoleReader();
+
+        consoleWriter("Enter number: ");
+        String number = consoleReader();
+
+        consoleWriter("Enter description: ");
+        String description = consoleReader();
 
         Contact contact = controller.addContact(name, number, description);
         if (contact != null) consoleWriter("#### Contact: " + contact + " ####\n#### was successfully added! ####\n");
@@ -97,8 +101,40 @@ public class ConsoleView {
         consoleWriter("############################################\n");
     }
 
-    public Contact deleteContact() {
-        return null;
+    /**
+     * Запускает диалог по удалению контакта, если передана строка вида id=2 - запускаем метод контроллера deleteContactById,
+     * если передано что-то другое, запускаем deleteContactByName
+     */
+    public void deleteContact() {
+        consoleWriter("Enter ID (like id=3) or name of contact to deleting: ");
+        String line = consoleReader();
+
+        //проверяем введен ли ID
+        if (line.startsWith("id=") && line.length() > 3) {
+            String idPart = line.substring(3).trim();
+            try {
+                int id = Integer.parseInt(idPart);
+                Contact contact = controller.deleteContactById(id);
+
+                if (contact == null) consoleWriter("Client with ID = " + id + " didn't found.\n");
+                else consoleWriter("#### Contact: " + contact + " ####\n#### was successfully deleted! ####\n");
+            }
+            //если не удалось распарсить в число, сообщаем об этом и перезапускаем метод
+            catch (IllegalArgumentException e) {
+                consoleWriter("Dab ID - " + idPart + ", again\n");
+                deleteContact();
+            }
+        }
+        //если нет, считаем, что введено имя
+        else {
+            Contact[] contacts = controller.deleteContactByName(line);
+
+            if (contacts == null) consoleWriter("Client with name " + line + " didn't found.\n");
+            else {
+                for (int i = 0; i < contacts.length; i++)
+                consoleWriter("#### Contact: " + contacts[i] + " ####\n#### was successfully deleted! ####\n");
+            }
+        }
     }
 
     /**

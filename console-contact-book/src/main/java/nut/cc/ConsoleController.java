@@ -17,11 +17,17 @@ public class ConsoleController {
         return view;
     }
 
+    /**
+     * Получаем EntityManagerFactory для еденицы сохраняемости contact-book-db
+     */
     public void initPersistContext() {
         emf = Persistence.createEntityManagerFactory("contact-book-db");
         em = emf.createEntityManager();
     }
 
+    /**
+     * Добавление контакта: его создание и запись в БД
+     */
     public Contact addContact(String name, String number, String description) {
 
         if (name.equals("") || number.equals("")) {
@@ -32,6 +38,27 @@ public class ConsoleController {
         contact.setData(name, number ,description);
         persistDataInDatabase(contact);
         return contact;
+    }
+
+    /**
+     * Редактирует контакт с переданным id, если какоето поле передано как null, то его не меняем
+     */
+    public Contact editContact(int id, String name, String number, String description) {
+        return null;
+    }
+
+    /**
+     * Удаление контакта из БД по его id
+     */
+    public Contact deleteContactById(int id) {
+        return null;
+    }
+
+    /**
+     * Удаление контакта(всех контактов) у которых имя совпадает с переданным значением
+     */
+    public Contact[] deleteContactByName(String name) {
+        return null;
     }
 
     public List<Contact> findAllContacts() {
@@ -52,6 +79,9 @@ public class ConsoleController {
         tx.commit();
     }
 
+    /**
+     * Закрываем ресурсы подключения к БД
+     */
     public void closeResources() {
         em.close();
         emf.close();
