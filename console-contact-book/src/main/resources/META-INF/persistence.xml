@@ -11,8 +11,8 @@
         <class>nut.cc.Contact</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://94.19.182.75:5432/db_for_test"/>
-            <property name="javax.persistence.jdbc.user" value="tester"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1:5432/db_for_test"/>
+            <property name="javax.persistence.jdbc.user" value="worktester"/>
             <property name="javax.persistence.jdbc.password" value="test"/>
             <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
             <property name="eclipselink.ddl-generation.output-mode" value="database"/>

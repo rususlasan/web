@@ -51,18 +51,37 @@ public class ConsoleController {
      * Удаление контакта из БД по его id
      */
     public Contact deleteContactById(int id) {
-        return null;
+        /*TypedQuery<Contact> findById = em.createQuery("SELECT c FROM Contact c WHERE c.id='2'", Contact.class);
+        Contact contact = findById.getSingleResult();*/
+        Contact contact = em.find(Contact.class, id);
+        deleteContactFromDatabaseAndContaxt(contact);
+        return contact;
     }
 
     /**
      * Удаление контакта(всех контактов) у которых имя совпадает с переданным значением
      */
-    public Contact[] deleteContactByName(String name) {
-        return null;
+    public List<Contact> deleteContactByName(String name) {
+        TypedQuery<Contact> findByName = em.createQuery("SELECT c FROM Contact c WHERE c.name=:contactname", Contact.class);
+        findByName.setParameter("contactname", name);
+
+        //выполняем именнованый запрос
+        List<Contact> contacts = findByName.getResultList();
+
+        //если не нашли ниодного контакта с переданным именем
+        if (contacts == null || contacts.size() == 0) return null;
+        else {
+            for(Contact contact: contacts) {
+                deleteContactFromDatabaseAndContaxt(contact);
+            }
+        }
+        return contacts;
     }
 
     public List<Contact> findAllContacts() {
-        TypedQuery<Contact> findAll = em.createQuery("SELECT c FROM Contact c", Contact.class);
+        //TypedQuery<Contact> findAll = em.createQuery("SELECT c FROM Contact c", Contact.class);
+        // может бросить IllegalArgumentException
+        TypedQuery<Contact> findAll = em.createNamedQuery("findAllContacts", Contact.class);
         List<Contact> contacts = findAll.getResultList();
         return contacts;
     }
@@ -70,12 +89,24 @@ public class ConsoleController {
     /**
      * Записывает переданный контакт в БД
      */
-    public void persistDataInDatabase(Contact contact) {
+    private void persistDataInDatabase(Contact contact) {
         EntityTransaction tx = em.getTransaction();
 
         //обеспечиваем постоянство(записываем в БД)
         tx.begin();
         em.persist(contact);
+        tx.commit();
+    }
+
+    /**
+     * Удаляет переданный контакт
+     */
+    private void deleteContactFromDatabaseAndContaxt(Contact contact) {
+        EntityTransaction tx = em.getTransaction();
+
+        //удаляем из БД
+        tx.begin();
+        em.remove(contact);
         tx.commit();
     }
 

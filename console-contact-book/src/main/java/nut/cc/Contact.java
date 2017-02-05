@@ -7,6 +7,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "console_contact")
+@NamedQuery(name = "findAllContacts", query = "SELECT c FROM Contact c")
 public class Contact {
 
     @Id

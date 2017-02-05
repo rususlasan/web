@@ -88,12 +88,19 @@ public class ConsoleView {
         String description = consoleReader();
 
         Contact contact = controller.addContact(name, number, description);
-        if (contact != null) consoleWriter("#### Contact: " + contact + " ####\n#### was successfully added! ####\n");
+        if (contact != null) consoleWriter("#### Contact: " + contact + " ####\n#### was successfully ADDED! ####\n");
         else consoleWriter("Contact didn't added.");
     }
 
     public void printAllContact() {
         List<Contact> contacts = controller.findAllContacts();
+
+        //если БД пуста
+        if(contacts.size() == 0) {
+            consoleWriter("There is now contacts in current database\n");
+            return;
+        }
+
         consoleWriter("############### ALL CONTACTS ###############\n");
         for (Contact contact: contacts) {
             consoleWriter(contact.toString() + "\n");
@@ -105,6 +112,7 @@ public class ConsoleView {
      * Запускает диалог по удалению контакта, если передана строка вида id=2 - запускаем метод контроллера deleteContactById,
      * если передано что-то другое, запускаем deleteContactByName
      */
+    // TODO: перенести всю логику по валидации ввода в ConsoleController
     public void deleteContact() {
         consoleWriter("Enter ID (like id=3) or name of contact to deleting: ");
         String line = consoleReader();
@@ -117,22 +125,22 @@ public class ConsoleView {
                 Contact contact = controller.deleteContactById(id);
 
                 if (contact == null) consoleWriter("Client with ID = " + id + " didn't found.\n");
-                else consoleWriter("#### Contact: " + contact + " ####\n#### was successfully deleted! ####\n");
+                else consoleWriter("#### Contact: " + contact + " ####\n#### was successfully DELETED! ####\n");
             }
             //если не удалось распарсить в число, сообщаем об этом и перезапускаем метод
             catch (IllegalArgumentException e) {
-                consoleWriter("Dab ID - " + idPart + ", again\n");
+                consoleWriter("Bab ID - " + idPart + ", try again\n");
                 deleteContact();
             }
         }
         //если нет, считаем, что введено имя
         else {
-            Contact[] contacts = controller.deleteContactByName(line);
+            List<Contact> contacts = controller.deleteContactByName(line);
 
             if (contacts == null) consoleWriter("Client with name " + line + " didn't found.\n");
             else {
-                for (int i = 0; i < contacts.length; i++)
-                consoleWriter("#### Contact: " + contacts[i] + " ####\n#### was successfully deleted! ####\n");
+                for (Contact contact: contacts)
+                consoleWriter("#### Contact: " + contact + " ####\n#### was successfully deleted! ####\n");
             }
         }
     }
