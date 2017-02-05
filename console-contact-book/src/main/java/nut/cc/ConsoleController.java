@@ -1,6 +1,7 @@
 package nut.cc;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConsoleController {
@@ -20,7 +21,8 @@ public class ConsoleController {
     /**
      * Получаем EntityManagerFactory для еденицы сохраняемости contact-book-db
      */
-    public void initPersistContext() {
+    // TODO: подумать, где лучше это сделать: в методе main или во время создания контроллера?
+    private void initPersistContext() {
         emf = Persistence.createEntityManagerFactory("contact-book-db");
         em = emf.createEntityManager();
     }
@@ -41,10 +43,56 @@ public class ConsoleController {
     }
 
     /**
-     * Редактирует контакт с переданным id, если какоето поле передано как null, то его не меняем
+     * Записывает переданный контакт в БД
+     */
+    private void persistDataInDatabase(Contact contact) {
+        EntityTransaction tx = em.getTransaction();
+
+        //обеспечиваем постоянство(записываем в БД)
+        tx.begin();
+        em.persist(contact);
+        tx.commit();
+    }
+
+    /**
+     * Редактирует контакт с переданным id, если какое-то поле передано как null, то его не меняем
      */
     public Contact editContact(int id, String name, String number, String description) {
         return null;
+    }
+
+    /**
+     * Удаление контакта, получает ввод пользователя и, в зависимоти от него, запускает один из методов:
+     * deleteContactById или deleteContactByName
+     */
+    public void deleteContact(String usersString) {
+        List<Contact> contactsToDelete = new ArrayList<>();
+
+        //проверяем введен ли ID
+        if (usersString.startsWith("id=") && usersString.length() > 3) {
+            String idPart = usersString.substring(3).trim();
+
+            //проверяем что idPart - это число, если не число, то:
+            if (idPart.replaceAll("[0-9]", "").length() != 0) {
+                view.printErrorMessage("Bab ID - " + idPart);
+            } else {
+                int id = Integer.parseInt(idPart);
+                Contact contactToDelete = deleteContactById(id);
+
+                if (contactToDelete == null) view.printErrorMessage("Client with ID " + id + " didn't found.");
+                else {
+                    contactsToDelete.add(contactToDelete);
+                    view.printDeletingResult(contactsToDelete);
+                }
+            }
+        }
+        //если нет, считаем, что введено имя
+        else {
+            contactsToDelete = deleteContactByName(usersString);
+
+            if (contactsToDelete == null) view.printErrorMessage("Client with name " + usersString + " didn't found.");
+            else view.printDeletingResult(contactsToDelete);
+        }
     }
 
     /**
@@ -54,7 +102,9 @@ public class ConsoleController {
         /*TypedQuery<Contact> findById = em.createQuery("SELECT c FROM Contact c WHERE c.id='2'", Contact.class);
         Contact contact = findById.getSingleResult();*/
         Contact contact = em.find(Contact.class, id);
-        deleteContactFromDatabaseAndContaxt(contact);
+
+        if (contact != null) deleteContactFromDatabaseAndContext(contact);
+
         return contact;
     }
 
@@ -72,42 +122,33 @@ public class ConsoleController {
         if (contacts == null || contacts.size() == 0) return null;
         else {
             for(Contact contact: contacts) {
-                deleteContactFromDatabaseAndContaxt(contact);
+                deleteContactFromDatabaseAndContext(contact);
             }
         }
         return contacts;
     }
 
-    public List<Contact> findAllContacts() {
-        //TypedQuery<Contact> findAll = em.createQuery("SELECT c FROM Contact c", Contact.class);
-        // может бросить IllegalArgumentException
-        TypedQuery<Contact> findAll = em.createNamedQuery("findAllContacts", Contact.class);
-        List<Contact> contacts = findAll.getResultList();
-        return contacts;
-    }
-
-    /**
-     * Записывает переданный контакт в БД
-     */
-    private void persistDataInDatabase(Contact contact) {
-        EntityTransaction tx = em.getTransaction();
-
-        //обеспечиваем постоянство(записываем в БД)
-        tx.begin();
-        em.persist(contact);
-        tx.commit();
-    }
-
     /**
      * Удаляет переданный контакт
      */
-    private void deleteContactFromDatabaseAndContaxt(Contact contact) {
+    private void deleteContactFromDatabaseAndContext(Contact contact) {
         EntityTransaction tx = em.getTransaction();
 
         //удаляем из БД
         tx.begin();
         em.remove(contact);
         tx.commit();
+    }
+
+    /**
+     * Поиск всех записей
+     */
+    public List<Contact> findAllContacts() {
+        //TypedQuery<Contact> findAll = em.createQuery("SELECT c FROM Contact c", Contact.class);
+        // может бросить IllegalArgumentException
+        TypedQuery<Contact> findAll = em.createNamedQuery("findAllContacts", Contact.class);
+        List<Contact> contacts = findAll.getResultList();
+        return contacts;
     }
 
     /**
