@@ -153,10 +153,10 @@ public class ConsoleView {
         writeInConsole("Enter new name: ");
         String newName = readFromConsole();
 
-        writeInConsole("\nEnter new number: ");
+        writeInConsole("Enter new number: ");
         String newNumber = readFromConsole();
 
-        writeInConsole("\nEnter new description: ");
+        writeInConsole("Enter new description: ");
         String newDescription = readFromConsole();
 
         Contact[] oldAndEditedContacts = controller.editContact(currName, newName, newNumber, newDescription);
@@ -176,7 +176,12 @@ public class ConsoleView {
      * Удаляет все контакты из БД
      */
     public void clearAllContacts() {
-        
+        writeInConsole("Are you really want to delete all contacts (yes/NO)? ");
+        String answer = readFromConsole();
+        if (answer.equals("yes")) {
+            controller.removeAllContacts();
+            writeInConsole("##### ALL CONTACTS WAS SUCCESSFULLY REMOVED #####\n");
+        } else writeInConsole("ABORTED!!!");
     }
 
     /**

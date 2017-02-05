@@ -126,6 +126,9 @@ public class ConsoleController {
         return oldAndEditedContact;
     }
 
+    /**
+     * Редактирует контакт и заносит изминения в БД
+     */
     private Contact editContact(Contact curr, String newName, String newNumber, String newDescription) {
         curr.setData(newName, newNumber, newDescription);
         EntityTransaction tx = em.getTransaction();
@@ -135,6 +138,18 @@ public class ConsoleController {
         tx.commit();
 
         return curr;
+    }
+
+    /**
+     * Очищает БД
+     */
+    public void removeAllContacts() {
+        EntityTransaction tx = em.getTransaction();
+
+        TypedQuery<Contact> removeQuery = em.createQuery("DELETE FROM Contact c", Contact.class);
+        tx.begin();
+        removeQuery.executeUpdate();
+        tx.commit();
     }
 
     /**
