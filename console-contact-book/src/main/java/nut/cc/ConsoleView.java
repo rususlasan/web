@@ -37,16 +37,18 @@ public class ConsoleView {
     private void begin() {
         String curr = "";
         while (true) {
-            consoleWriter("Change command: \nc - create contact,\np - print all contact,\nd - delete contact,\nq - quit program\n");
-            curr = consoleReader();
+            writeInConsole("Change command: \nc - create contact,\ne - edit contact,\np - print all contact,\nd - delete contact,\nclear - clear all contacts,\nq - quit program\n");
+            curr = readFromConsole();
             if (curr.equals("q")) {
                 exit();
                 return;
             }
             else if (curr.equals("c")) addContact();
             else if (curr.equals("d")) deleteContact();
+            else if (curr.equals("e")) editContact();
             else if (curr.equals("p")) printAllContact();
-            else consoleWriter("Command " + curr + " not found, try again.\n");
+            else if (curr.equals("clear")) clearAllContacts();
+            else writeInConsole("Command \"" + curr + "\" not found, try again.\n");
         }
     }
 
@@ -54,12 +56,12 @@ public class ConsoleView {
      * Считывает строку с консоли.
      * Перед считывание выводит сообщение в консоль, если оно передано
      */
-    private String consoleReader() {
+    private String readFromConsole() {
         String res = "";
         try {
             res = reader.readLine();
         } catch (IOException e) {
-            consoleWriter("IOException in consoleReader(): " + e.getMessage() + "\n");
+            writeInConsole("IOException in readFromConsole(): " + e.getMessage() + "\n");
         } finally {
             return res;
         }
@@ -69,7 +71,7 @@ public class ConsoleView {
     /**
      * Выводит в консоль переданную строку
      */
-    private void consoleWriter(String message) {
+    private void writeInConsole(String message) {
         if (message != null && !message.equals("")) {
             System.out.print(message);
         }
@@ -81,18 +83,24 @@ public class ConsoleView {
      */
     public void addContact() {
         //считываем данные с консоли, для создания контакта
-        consoleWriter("Enter name: ");
-        String name = consoleReader();
+        writeInConsole("Enter name: ");
+        String name = readFromConsole();
 
-        consoleWriter("Enter number: ");
-        String number = consoleReader();
+        //проверим, что контакта с таким именем нет
+        if (controller.isExist(name)) {
+            writeInConsole("Contact with name \"" + name.trim() + "\" existing. Break!\n");
+            return;
+        }
 
-        consoleWriter("Enter description: ");
-        String description = consoleReader();
+        writeInConsole("Enter number: ");
+        String number = readFromConsole();
+
+        writeInConsole("Enter description: ");
+        String description = readFromConsole();
 
         Contact contact = controller.addContact(name, number, description);
-        if (contact != null) consoleWriter("#### Contact: " + contact + " ####\n#### was successfully ADDED! ####\n");
-        else consoleWriter("Contact didn't added.");
+        if (contact != null) writeInConsole("#### Contact: " + contact + " ####\n#### was successfully ADDED! ####\n");
+        else writeInConsole("Contact DIDN'T ADDED.");
     }
 
     public void printAllContact() {
@@ -100,43 +108,82 @@ public class ConsoleView {
 
         //если БД пуста
         if(contacts.size() == 0) {
-            consoleWriter("There is now contacts in current database\n");
+            writeInConsole("There is now contacts in current database\n");
             return;
         }
 
-        consoleWriter("############### ALL CONTACTS ###############\n");
+        writeInConsole("############### ALL CONTACTS ###############\n");
+        int i = 1;          //порядковый номер (текущий, при удалении, может изменятся)
         for (Contact contact: contacts) {
-            consoleWriter(contact.toString() + "\n");
+            writeInConsole(i + ". " + contact.toString() + "\n");
+            i++;
         }
-        consoleWriter("############################################\n");
+        writeInConsole("############################################\n");
     }
 
     /**
-     * Запускает диалог по удалению контакта, если передана строка вида id=2 - запускаем метод контроллера deleteContactById,
-     * если передано что-то другое, запускаем deleteContactByName
+     * Запускает диалог по удалению контакта, удаление возможно только по имени
      */
-    // TODO: перенести всю логику по валидации ввода в ConsoleController
     public void deleteContact() {
-        consoleWriter("Enter ID (like id=3) or name of contact to deleting: ");
-        String input = consoleReader();
+        writeInConsole("Enter name of contact to deleting: ");
+        String input = readFromConsole();
 
-        controller.deleteContact(input);
+        Contact deletedContact = controller.deleteContactByName(input);
+
+        if (deletedContact != null) writeInConsole("#### Contact: " + deletedContact + " ####\n#### was successfully DELETED! ####\n");
     }
 
     /**
-     * печатает результаты удаления (вызывается контроллером)
+     * запускает диалог редактирования контакта
+     * редактирование возможно только по id
      */
-    public void printDeletingResult(List<Contact> deletedContacts) {
-        for (Contact del: deletedContacts) {
-            consoleWriter("#### Contact: " + del + " ####\n#### was successfully DELETED! ####\n");
+    public void editContact() {
+        //считываем необходимые данные
+        writeInConsole("Enter a name of contact , that you will edit: \n");
+        String currName = readFromConsole();
+
+        //если такого контакта не существует, то прерываем диалог
+        if (!controller.isExist(currName)) {
+            writeInConsole("Contact with name \"" + currName.trim() + "\" isn't existing. Break!");
+            return;
         }
+
+        writeInConsole("Enter new data, to skip press \"Enter\"\n");
+
+        writeInConsole("Enter new name: ");
+        String newName = readFromConsole();
+
+        writeInConsole("\nEnter new number: ");
+        String newNumber = readFromConsole();
+
+        writeInConsole("\nEnter new description: ");
+        String newDescription = readFromConsole();
+
+        Contact[] oldAndEditedContacts = controller.editContact(currName, newName, newNumber, newDescription);
+
+        if (oldAndEditedContacts != null) {
+            writeInConsole("\n#### Contact \"" + currName.trim() + "\" was successfully edited ####\n");
+            writeInConsole("Old data: " + oldAndEditedContacts[0]);
+            writeInConsole("\nNew data: " + oldAndEditedContacts[1]);
+            writeInConsole("\n###########################\n");
+        } else {
+            writeInConsole("\nContact didn't edited!\n");
+        }
+
     }
 
     /**
-     * печатает сообщение об ошибке(вызывается контроллером)
+     * Удаляет все контакты из БД
      */
-    public void printErrorMessage(String s) {
-        consoleWriter(s + "\n");
+    public void clearAllContacts() {
+        
+    }
+
+    /**
+     * печатает сообщение пользователю(вызывается контроллером)
+     */
+    public void printMessage(String s) {
+        writeInConsole(s + "\n");
     }
 
     /**
@@ -147,8 +194,8 @@ public class ConsoleView {
         try {
             reader.close();
         } catch (IOException e) {
-            consoleWriter("Can't close reader....\n");
+            writeInConsole("Can't close reader....\n");
         }
-        consoleWriter("Ending program!\n");
+        writeInConsole("Ending program!\n");
     }
 }

@@ -1,7 +1,6 @@
 package nut.cc;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ConsoleController {
@@ -43,6 +42,13 @@ public class ConsoleController {
     }
 
     /**
+     * проверяет, есть ли контакт с переданным именем
+     */
+    public boolean isExist(String name) {
+        return findContactByName(name.trim()) != null;
+    }
+
+    /**
      * Записывает переданный контакт в БД
      */
     private void persistDataInDatabase(Contact contact) {
@@ -55,77 +61,19 @@ public class ConsoleController {
     }
 
     /**
-     * Редактирует контакт с переданным id, если какое-то поле передано как null, то его не меняем
+     * Удаление контакта у которого имя совпадает с переданным значением
      */
-    public Contact editContact(int id, String name, String number, String description) {
-        return null;
-    }
+    public Contact deleteContactByName(String name) {
+        name = name.trim();
 
-    /**
-     * Удаление контакта, получает ввод пользователя и, в зависимоти от него, запускает один из методов:
-     * deleteContactById или deleteContactByName
-     */
-    public void deleteContact(String usersString) {
-        List<Contact> contactsToDelete = new ArrayList<>();
+        //ищем контакт с указанным именем в БД
+        Contact contactToDelete = findContactByName(name);
 
-        //проверяем введен ли ID
-        if (usersString.startsWith("id=") && usersString.length() > 3) {
-            String idPart = usersString.substring(3).trim();
+        //если нашли контакт, то удаляем его
+        if (contactToDelete != null) deleteContactFromDatabaseAndContext(contactToDelete);
+        else view.printMessage("Client with name \"" + name + "\" didn't found.");
 
-            //проверяем что idPart - это число, если не число, то:
-            if (idPart.replaceAll("[0-9]", "").length() != 0) {
-                view.printErrorMessage("Bab ID - " + idPart);
-            } else {
-                int id = Integer.parseInt(idPart);
-                Contact contactToDelete = deleteContactById(id);
-
-                if (contactToDelete == null) view.printErrorMessage("Client with ID " + id + " didn't found.");
-                else {
-                    contactsToDelete.add(contactToDelete);
-                    view.printDeletingResult(contactsToDelete);
-                }
-            }
-        }
-        //если нет, считаем, что введено имя
-        else {
-            contactsToDelete = deleteContactByName(usersString);
-
-            if (contactsToDelete == null) view.printErrorMessage("Client with name " + usersString + " didn't found.");
-            else view.printDeletingResult(contactsToDelete);
-        }
-    }
-
-    /**
-     * Удаление контакта из БД по его id
-     */
-    public Contact deleteContactById(int id) {
-        /*TypedQuery<Contact> findById = em.createQuery("SELECT c FROM Contact c WHERE c.id='2'", Contact.class);
-        Contact contact = findById.getSingleResult();*/
-        Contact contact = em.find(Contact.class, id);
-
-        if (contact != null) deleteContactFromDatabaseAndContext(contact);
-
-        return contact;
-    }
-
-    /**
-     * Удаление контакта(всех контактов) у которых имя совпадает с переданным значением
-     */
-    public List<Contact> deleteContactByName(String name) {
-        TypedQuery<Contact> findByName = em.createQuery("SELECT c FROM Contact c WHERE c.name=:contactname", Contact.class);
-        findByName.setParameter("contactname", name);
-
-        //выполняем именнованый запрос
-        List<Contact> contacts = findByName.getResultList();
-
-        //если не нашли ниодного контакта с переданным именем
-        if (contacts == null || contacts.size() == 0) return null;
-        else {
-            for(Contact contact: contacts) {
-                deleteContactFromDatabaseAndContext(contact);
-            }
-        }
-        return contacts;
+        return contactToDelete;
     }
 
     /**
@@ -138,6 +86,55 @@ public class ConsoleController {
         tx.begin();
         em.remove(contact);
         tx.commit();
+    }
+
+    private Contact findContactByName(String name) {
+        //формируем запрос к БД о поиске контакта
+        TypedQuery<Contact> findByName = em.createQuery("SELECT c FROM Contact c WHERE c.name=:contactname", Contact.class);
+        findByName.setParameter("contactname", name);
+
+        Contact contact;
+        //выполняем запрос
+        try {
+            contact = findByName.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+        return contact;
+    }
+
+    /**
+     * Редактирует контакт с переданным id, если какое-то поле передано как null, то его не меняем
+     * возвращает массив из 2-х эллементов(либо null), где первый эллемент - старая версия контакта, 2-ой - отредактированная
+     */
+    public Contact[] editContact(String currName, String newName, String newNumber, String newDescription) {
+
+        Contact curr = findContactByName(currName);
+        if (curr == null) return null;
+
+        Contact[] oldAndEditedContact = new Contact[2];
+
+        //сохраняем текущее состояние аккаунта
+        oldAndEditedContact[0] = new Contact();
+        oldAndEditedContact[0].setData(currName, curr.getNumber(), curr.getDescrition());
+
+        if (newNumber.length() == 0) newNumber = "NONE";
+        if (newDescription.length() == 0) newDescription = "NONE";
+
+        oldAndEditedContact[1] = editContact(curr, newName, newNumber, newDescription);
+
+        return oldAndEditedContact;
+    }
+
+    private Contact editContact(Contact curr, String newName, String newNumber, String newDescription) {
+        curr.setData(newName, newNumber, newDescription);
+        EntityTransaction tx = em.getTransaction();
+
+        tx.begin();
+        em.merge(curr);
+        tx.commit();
+
+        return curr;
     }
 
     /**

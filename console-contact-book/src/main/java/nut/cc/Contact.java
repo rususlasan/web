@@ -49,8 +49,7 @@ public class Contact {
 
     @Override
     public String toString() {
-        return new StringBuilder().append(id)
-                .append("\t\t")
+        return new StringBuilder()
                 .append(name)
                 .append("\t\t")
                 .append(number)
