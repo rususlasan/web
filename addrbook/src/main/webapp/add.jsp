@@ -7,7 +7,7 @@
     </head>
     <body>
         <h1>Вводим данные, не спим!</h1>
-        <form action="/addrbook-1/doadd" type="post">
+        <form action="/addrbook/doadd" type="post">
             <table>
 		<tr>
                     <td><label for="name_field"> Имя </label></td>

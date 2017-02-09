@@ -1,4 +1,4 @@
-package nut.cc.addrbook;
+package nut.cc.addrbook.servlets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -8,7 +8,10 @@ import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/addrbook")
+/**
+ * Все обращения на адреса ../main и ../index.html будут обрабатываться данным сервлетом
+ */
+@WebServlet({"/main", "/index.html"})
 public class MainPage extends HttpServlet {
     
     @Override
@@ -16,12 +19,4 @@ public class MainPage extends HttpServlet {
                 throws ServletException, IOException {
         req.getRequestDispatcher("main.jsp").forward(req, res);
     }
-    
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
-            throws ServletException, IOException {
- 
-        //super.doPost(req, resp);
-    }
-    
 }

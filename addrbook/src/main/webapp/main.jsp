@@ -13,7 +13,5 @@
             <li><em><a href="find.jsp">Найти</a></em> контакт</li> 
             <li><em><a href="allcontacts.jsp">Показать все</a></em> контакты</li>  
         </ul>
-        <img src="/head.jpg" alt="123123">
-       
     </body>
 </html>
