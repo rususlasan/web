@@ -18,9 +18,12 @@ public class DoAdd extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+
+
+        /*response.setContentType("text/html;charset=UTF-8");
+
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
+        //    TODO output your page here. You may use following sample code.
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -30,7 +33,7 @@ public class DoAdd extends HttpServlet {
             out.println("<h1>Запрос на добавление получен (в скобочках нет)</h1>");
             out.println("</body>");
             out.println("</html>");
-        }
+        }*/
     }
     
     @Override
@@ -42,12 +45,12 @@ public class DoAdd extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.getRequestDispatcher("index.html");
         
-        
-        processRequest(request, response);
+      /*  processRequest(request, response);
         
         PrintWriter pw = response.getWriter();
-        pw.write("Запрос (POST) на добавление получен (в скобочках нет)");
+        pw.write("Запрос (POST) на добавление получен (в скобочках нет)");*/
     }
 
     @Override
