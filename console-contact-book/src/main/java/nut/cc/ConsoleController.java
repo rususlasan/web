@@ -118,8 +118,9 @@ public class ConsoleController {
         oldAndEditedContact[0] = new Contact();
         oldAndEditedContact[0].setData(currName, curr.getNumber(), curr.getDescrition());
 
-        if (newNumber.length() == 0) newNumber = "NONE";
-        if (newDescription.length() == 0) newDescription = "NONE";
+        if (newName.length() == 0) newName = curr.getName();
+        if (newNumber.length() == 0) newNumber = curr.getNumber();
+        if (newDescription.length() == 0) newDescription = curr.getDescrition();
 
         oldAndEditedContact[1] = editContact(curr, newName, newNumber, newDescription);
 
