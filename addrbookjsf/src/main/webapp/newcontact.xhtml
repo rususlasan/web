@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="en" lang="en">
+<ui:composition template="layout.xhtml">
+
+    <ui:define name="title">Создать новый контакт</ui:define>
+    <ui:define name="content">
+        <h:form id="contactform">
+            <h:panelGrid columns="2">
+                <h:outputLabel value="Имя : "/>
+                <h:inputText value="#{contactController.contact.name}"/>
+                <h:outputLabel value="Номер : "/>
+                <h:inputText value="#{contactController.contact.number}"/>
+                <h:outputLabel value="Описание : "/>
+                <h:inputTextarea value="#{contactController.contact.description}" cols="16" rows="3"/>
+                <h:outputLabel value="Иллюстрация : "/>
+                <h:selectBooleanCheckbox value="#{contactController.contact.illustration}"/>
+
+                <h:commandButton value="создать контакт" action="#{contactController.doCreateContact}">
+                    <f:ajax execute="@form" render=":booklist :errors"/>
+                </h:commandButton>
+
+            </h:panelGrid>
+        </h:form>
+
+        <hr/>
+        <h1>Список контактов</h1>
+
+        <h:dataTable id="contactlist" value="#{contactEJB.findAllContatc()}" var="con" border="1">
+            <h:column>
+                <f:facet name="header">
+                    <h:outputText value="Имя"/>
+                </f:facet>
+                <h:link outcome="view.xhtml=#{con.id}" value="#{con.name}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">
+                    <h:outputText value="номер"/>
+                </f:facet>
+                <h:outputText value="#{con.number}"/>
+            </h:column>
+        </h:dataTable>
+
+    </ui:define>
+
+</ui:composition>
+</html>

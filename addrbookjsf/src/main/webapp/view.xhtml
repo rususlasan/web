@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="en" lang="en">
+<ui:composition template="layout.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{contactController.contact.id}"/>
+        <f:viewAction action="#{contactController.doFindContactById}"/>
+    </f:metadata>
+
+    <ui:define name="title">Контакт</ui:define>
+    <ui:define name="content">
+        <h:panelGrid columns="2">
+            <h:outputLabel value="Имя : "/>
+            <h:outputText value="#{contactController.contact.name}"/>
+            <h:outputLabel value="Номер : "/>
+            <h:outputText value="#{contactController.contact.number}"/>
+            <h:outputLabel value="Описание : "/>
+            <h:outputText value="#{contactController.contact.description}" cols="16" rows="3"/>
+            <h:outputLabel value="Иллюстрация : "/>
+            <h:selectBooleanCheckbox value="#{contactController.contact.illustration}"/>
+        </h:panelGrid>
+    </ui:define>
+
+</ui:composition>
+</html>
