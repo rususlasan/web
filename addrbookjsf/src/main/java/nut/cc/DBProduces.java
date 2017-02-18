@@ -12,7 +12,7 @@ import javax.persistence.PersistenceContext;
 public class DBProduces {
 
     @Produces
-    @PersistenceContext(unitName = "addrbook-web"/*"addrbook-db"*/)
+    @PersistenceContext(unitName = "addrbook_db"/*"addrbook-db"*/)
     private EntityManager em;
 
 }
